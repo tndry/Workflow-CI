@@ -1,0 +1,36 @@
+name: Retrain Model CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'MLProject/**'
+
+jobs:
+  train-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Langkah 1: Mengambil kode dari repository
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Langkah 2: Setup environment Conda untuk MLflow Project
+    - name: Set up Conda
+      uses: conda-incubator/setup-miniconda@v3
+      with:
+        auto-update-conda: true
+        python-version: 3.12.7
+
+    # Langkah 3: Menjalankan MLflow Project
+    - name: Run MLflow Project to Train Model
+      shell: bash -l {0}
+      run: mlflow run ./MLProject
+
+    # Langkah 4: Unggah model.pkl sebagai artefak 
+    - name: Upload Model Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: trained-model-artifact
+        path: MLProject/model.pkl
